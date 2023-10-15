@@ -11,12 +11,23 @@ export default function Home() {
   const [cardImage, setCardImage] = useState('https://www.deckofcardsapi.com/static/img/back.png')
   const [cardColor, setCardColor] = useState()
   const [rightGuesses, setRightGuesses] = useState(0)
-  const [remaining, setRemaining] = useState(0)
+  const [remaining, setRemaining] = useState(52)
+  const [error, setError] = useState()
 
   
   useEffect(()=>{
     createDeck()
   },[])
+
+  useEffect(() => {
+    if(window.localStorage.getItem("remaining")){
+      console.log(JSON.parse(window.localStorage.getItem("remaining")));
+      setRemaining(JSON.parse(window.localStorage.getItem("remaining")));
+      setRightGuesses(JSON.parse(window.localStorage.getItem("guess")));
+      setCardImage(window.localStorage.getItem("cardImage"));
+    }
+    
+  }, []);
 
   const createDeck = async () =>{
     let repo;
@@ -24,7 +35,7 @@ export default function Home() {
     if(!hasCookie("deck")){
       const res = await fetch("https://www.deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1");
       repo = await res.json();
-      console.log(repo.deck_id);
+      console.log(repo);
     }
     console.log(repo);
   } 
@@ -40,22 +51,84 @@ export default function Home() {
       .then((response)=>{
         return response.json()
       }).then((obj)=>{
+        if(!obj.success && obj.remaining === 0){
+
+        }
         console.log(obj);
 
         setCard(obj)
         setCardImage(obj.cards[0].image)
         setCardColor(obj.cards[0].suit)
         setRemaining(obj.remaining)
+        window.localStorage.setItem("remaining", obj.remaining);
+        window.localStorage.setItem("cardImage", obj.cards[0].image);
+
 
         if(color === "red"){
           if(obj.cards[0].suit === "HEARTS" || obj.cards[0].suit === "DIAMONDS"){
             setRightGuesses(rightGuesses+1)
+            window.localStorage.setItem("guess", rightGuesses+1);
           }
         }
         if(color === "black"){
           if(obj.cards[0].suit === "SPADES" || obj.cards[0].suit === "CLUBS"){
             setRightGuesses(rightGuesses+1)
+            window.localStorage.setItem("guess", rightGuesses+1);
           }
+        }
+      })
+    } catch (error) {
+      console.log("error", error)
+    }
+
+
+
+    
+
+    
+  }
+  const shuffle = async (color) => {
+
+    
+    const deckId = getCookie('deck')
+
+    try {
+      const res = await fetch(`https://www.deckofcardsapi.com/api/deck/${deckId}/shuffle/?remaining=true`)
+      .then((response)=>{
+        return response.json()
+      }).then((obj)=>{
+        if(obj.shuffled){
+          alert("shuffled")
+        }
+      })
+    } catch (error) {
+      console.log("error", error)
+    }
+
+
+
+    
+
+    
+  }
+  const restart = async () => {
+
+    
+    const deckId = getCookie('deck')
+
+    try {
+      const res = await fetch(`ng=true`)
+      .then((response)=>{
+        return response.json()
+      }).then((obj)=>{
+        if(obj.success){
+          setCookie("deck", obj.deck_id)
+          setRemaining(52)
+          setRightGuesses(0)
+          setCardImage('https://www.deckofcardsapi.com/static/img/back.png')
+          window.localStorage.setItem("remaining", 52);
+          window.localStorage.setItem("remaining", 0);
+          window.localStorage.setItem("cardImage", 'https://www.deckofcardsapi.com/static/img/back.png');
         }
       })
     } catch (error) {
@@ -84,9 +157,9 @@ export default function Home() {
         </div>
 
         <div className="flex w-full justify-between items-center border-b mb-4 border-gray-300 bg-gradient-to-b from-zinc-200 p-4 backdrop-blur-2xl dark:text-white dark:border-neutral-500 dark:bg-zinc-800/30 dark:from-inherit rounded-xl border bg-gray-200">
-          <div>shuffle</div>
-          <div>remaining:{remaining}</div>
-          <div>new game</div>
+          <button className='bg-black text-white text-sm w-16 p-1 px-2 rounded-xl' onClick={()=>shuffle()}>shuffle</button>
+          <div>pile : {remaining}</div>
+          <button className='bg-green-900 text-white text-sm w-16 p-1 px-2 rounded-xl' onClick={()=>restart()}>restart</button>
         </div>
         
 
@@ -99,7 +172,6 @@ export default function Home() {
             <img src="https://www.deckofcardsapi.com/static/img/back.png" height={200} width={150} alt="Cards" className='absolute' />
           </div>
         </div>
-        <p>remaining: {remaining}</p>
 
         <div className='flex flex-row justify-center items-center mt-12 space-x-4 dark:text-white'>
               <button className='bg-red-400 text-white px-10 py-2 rounded-xl' onClick={()=>deal('red')}>Red</button>
@@ -114,6 +186,10 @@ export default function Home() {
           Ads
         </div>
 
+      </div>
+      <div className='w-full h-screen absolute inset-0 bg-white bg-opacity-90 flex flex-col justify-center items-center z-20'>
+        <p>{error}</p>
+        <button className='bg-green-800 text-white text-sm  p-4 px-10 rounded-xl' onClick={()=>restart()}>New Game</button>
       </div>
 
       
