@@ -3,6 +3,8 @@ import Header from '@/components/header'
 import { Inter } from 'next/font/google';
 import { setCookie, hasCookie, getCookie } from 'cookies-next';
 import { useEffect, useState } from 'react'
+import { useSession, signIn, signOut } from 'next-auth/react'
+import { data } from 'autoprefixer';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -13,10 +15,14 @@ export default function Home() {
   const [rightGuesses, setRightGuesses] = useState(0)
   const [remaining, setRemaining] = useState(52)
   const [error, setError] = useState()
+  const [score, setScore] = useState(0);
+
+  const {data: session } = useSession()
 
   
   useEffect(()=>{
     createDeck()
+    fetchData()
   },[])
 
   useEffect(() => {
@@ -28,7 +34,26 @@ export default function Home() {
     }
     
   }, []);
+  
 
+  async function fetchData(){
+  
+    if(session){
+      console.log("header");
+      const res = await fetch('/api/getUser', {
+        method : 'POST',
+        body : JSON.stringify({
+            email: session.user.email,
+        }),
+        headers : {
+            'Content-Type' : 'application/json'
+        }
+    });
+    const data = await res.json();
+    console.log(data);
+    setScore(data)
+    }
+  }
   const createDeck = async () =>{
     let repo;
     console.log(hasCookie("deck"));
@@ -50,9 +75,27 @@ export default function Home() {
       const res = await fetch(`https://www.deckofcardsapi.com/api/deck/${deckId}/draw/?count=1`)
       .then((response)=>{
         return response.json()
-      }).then((obj)=>{
+      }).then( async (obj)=>{
         if(!obj.success && obj.remaining === 0){
-
+          if(session){
+            console.log("update score");
+            const res = await fetch("/api/updatescore", {
+              method: "POST",
+              body: JSON.stringify({
+                score: rightGuesses,
+                email: session.user.email
+              }),
+              headers : {
+                'Content-Type' : 'application/json'
+            }
+            })
+            console.log(res);
+          }
+          
+          const modal = document.getElementById("modal")
+          modal.classList.toggle("hidden")
+          modal.classList.toggle("flex")
+          setError(obj.error)
         }
         console.log(obj);
 
@@ -113,11 +156,13 @@ export default function Home() {
   }
   const restart = async () => {
 
-    
+    const modal = document.getElementById("modal")
+    modal.classList.toggle("hidden")
+    modal.classList.toggle("flex")
     const deckId = getCookie('deck')
 
     try {
-      const res = await fetch(`ng=true`)
+      const res = await fetch(`https://www.deckofcardsapi.com/api/deck/new/shuffle/`)
       .then((response)=>{
         return response.json()
       }).then((obj)=>{
@@ -127,33 +172,33 @@ export default function Home() {
           setRightGuesses(0)
           setCardImage('https://www.deckofcardsapi.com/static/img/back.png')
           window.localStorage.setItem("remaining", 52);
-          window.localStorage.setItem("remaining", 0);
+          window.localStorage.setItem("guess", 0);
           window.localStorage.setItem("cardImage", 'https://www.deckofcardsapi.com/static/img/back.png');
         }
       })
     } catch (error) {
       console.log("error", error)
     }
+  }
 
-
-
-    
-
-    
+  const mod = () => {
+    const modal = document.getElementById("modal")
+    modal.classList.toggle("hidden")
+    modal.classList.toggle("flex")
   }
   
   return (
     <main
-      className={`flex min-h-screen flex-col items-center justify-start p-8 pt-16 m:p-24 bg-inherit dark:bg-black ${inter.className}`}
+      className={`flex min-h-screen flex-col items-center justify-start p-8 pt-4 m:p-24 bg-inherit dark:bg-black ${inter.className}`}
     >
-      <Header />
+      <Header score={score} />
 
 
 
       <div className='max-w-5xl w-full flex flex-col items-center justify-center'>
         <div className='p-8 flex flex-col justify-center items-center'>
-          <h1 className='text-xl md:text-3xl dark:text-white font-bold'>TumTum anaa s3 KorKor</h1>
-          <h1 className='text-xl dark:text-white md:text-3xl'>(Guess Black or Red)</h1>
+          {/* <h1 className='text-xl md:text-3xl dark:text-white font-bold'>TumTum anaa s3 KorKor</h1> */}
+          <h1 className='text-xl dark:text-white md:text-3xl'>Guess Black or Red</h1>
         </div>
 
         <div className="flex w-full justify-between items-center border-b mb-4 border-gray-300 bg-gradient-to-b from-zinc-200 p-4 backdrop-blur-2xl dark:text-white dark:border-neutral-500 dark:bg-zinc-800/30 dark:from-inherit rounded-xl border bg-gray-200">
@@ -187,7 +232,7 @@ export default function Home() {
         </div>
 
       </div>
-      <div className='w-full h-screen absolute inset-0 bg-white bg-opacity-90 flex flex-col justify-center items-center z-20'>
+      <div id="modal" className='absolute inset-0 bg-white bg-opacity-90 flex-col justify-center items-center z-20 hidden'>
         <p>{error}</p>
         <button className='bg-green-800 text-white text-sm  p-4 px-10 rounded-xl' onClick={()=>restart()}>New Game</button>
       </div>
