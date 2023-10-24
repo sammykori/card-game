@@ -36,7 +36,7 @@ export default function header({score}) {
               <code className="font-mono font-bold">with love</code>
             </p>
             <div className='flex flex-row px-[4px] py-[2px] rounded-full space-x-1 relative w-6'>
-              <MoonIcon className='w-4 h-4 rounded-full absolute ' id="moon" onClick={()=>{toggleMode()}}/>
+              <MoonIcon className='w-4 h-4 roundexd-full absolute ' id="moon" onClick={()=>{toggleMode()}}/>
               <SunIcon className='w-4 h-4 rounded-full absolute hidden' id="sun" onClick={()=>{toggleMode()}}/>
             </div>
         
@@ -45,7 +45,8 @@ export default function header({score}) {
             {session? <img src={session.user.image} width={40} height={50} className="rounded-full" onClick={()=>toggleDropdown()} /> : <button className=' dark:border-gray-300 dark:bg-gradient-to-b dark:from-zinc-200 dark:to-white  p-1 text-white dark:text-black border-neutral-500 bg-zinc-800/30 from-inherit rounded-lg' onClick={()=> signIn()}>Login</button>}
             <div className='bg-slate-100 w-32 rounded-xl p-4 shadow-md hidden justify-start items-start absolute mt-2' id="dropdown">
               <ul className='flex flex-col justify-start items-start'>
-                <li>PHS: {score}</li>
+                <li>PHS: {score} </li>
+                <li><a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-text="Can you beat my latest High score on TumTum Anaaa s3 KorKor?" data-url="https://games.sammykori.com" data-show-count="false">Tweet</a></li>
                 <li onClick={()=>signOut()} className="underline font-bold cursor-pointer">logout</li>
               </ul>
             </div>
@@ -56,8 +57,8 @@ export default function header({score}) {
         
         <div className="fixed bottom-0 left-0 flex h-20 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black dark:text-white lg:static lg:h-auto lg:w-auto lg:bg-none">
           <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
+            className="pointer-cursor flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
+            href="https://sammykori.com"
             target="_blank"
             rel="noopener noreferrer"
           >

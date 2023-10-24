@@ -7,6 +7,7 @@ export default function Document() {
       <Head >
       <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4444864222461908"
      crossorigin="anonymous"></script>
+     <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
       </Head>
       <body>
         <Main />

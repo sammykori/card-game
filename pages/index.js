@@ -198,13 +198,13 @@ export default function Home() {
       <div className='max-w-5xl w-full flex flex-col items-center justify-center'>
         <div className='p-8 flex flex-col justify-center items-center'>
           {/* <h1 className='text-xl md:text-3xl dark:text-white font-bold'>TumTum anaa s3 KorKor</h1> */}
-          <h1 className='text-xl dark:text-white md:text-3xl'>Guess Black or Red</h1>
+          <h1 className='text-xl dark:text-white md:text-3xl'><span className='text-black font-black'>Black</span> or <span className='text-red-600 font-black'>Red</span></h1>
         </div>
 
         <div className="flex w-full justify-between items-center border-b mb-4 border-gray-300 bg-gradient-to-b from-zinc-200 p-4 backdrop-blur-2xl dark:text-white dark:border-neutral-500 dark:bg-zinc-800/30 dark:from-inherit rounded-xl border bg-gray-200">
-          <button className='bg-black text-white text-sm w-16 p-1 px-2 rounded-xl' onClick={()=>shuffle()}>shuffle</button>
+          <button className='bg-black text-white text-sm w-16 p-1 px-2 rounded-xl' onClick={()=>shuffle()}>Shuffle</button>
           <div>pile : {remaining}</div>
-          <button className='bg-green-900 text-white text-sm w-16 p-1 px-2 rounded-xl' onClick={()=>restart()}>restart</button>
+          <button className='bg-green-900 text-white text-sm w-16 p-1 px-2 rounded-xl' onClick={()=>restart()}>Restart</button>
         </div>
         
 
